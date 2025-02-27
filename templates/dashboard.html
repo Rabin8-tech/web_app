@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    /* Auth links: Login and Register side by side in top-right corner */
+    .auth-links {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+    .auth-links a {
+      color: white;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid white;
+      border-radius: 4px;
+    }
+    .auth-links a:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    /* Flash messages styling */
+    .flash-messages {
+      margin-bottom: 1rem;
+    }
+    .flash-messages .alert {
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid transparent;
+      border-radius: 4px;
+    }
+    .alert-warning {
+      background-color: #fff3cd;
+      border-color: #ffeeba;
+      color: #856404;
+    }
+    .alert-danger {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+    .alert-success {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+    .alert-info {
+      background-color: #d1ecf1;
+      border-color: #bee5eb;
+      color: #0c5460;
+    }
+    .form-container {
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .form-container h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .input-container {
+      position: relative;
+      width: 100%;
+    }
+    .input-container input {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      outline: none;
+    }
+    .input-container input:focus {
+      border-color: #007bff;
+    }
+    .filter-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #007bff;
+      cursor: pointer;
+    }
+    .media-select {
+      display: none;
+      border: 1px solid #ddd;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      background: #fff;
+      color: #007bff;
+      cursor: pointer;
+      width: 130px;
+      margin-top: 10px;
+    }
+    .form-group select,
+    .form-group button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      outline: none;
+    }
+    .form-group button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .form-group button:hover {
+      background-color: #0056b3;
+    }
+    .media-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .media-item {
+      width: calc(33% - 1rem);
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .media-item:hover {
+      transform: translateY(-10px);
+    }
+    .media-item img,
+    .media-item video,
+    .media-item audio {
+      width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .media-item p {
+      margin-top: 1rem;
+      font-weight: 600;
+      color: #333;
+    }
+    .no-media {
+      text-align: center;
+      font-size: 1.25rem;
+      color: #888;
+    }
+    @media (max-width: 768px) {
+      .media-item {
+        width: calc(50% - 1rem);
+      }
+    }
+    @media (max-width: 480px) {
+      .media-item {
+        width: 100%;
+      }
+      .container {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Media Dashboard</h1>
+    <div class="auth-links">
+      {% if not session.get('user_id') %}
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+      {% else %}
+        <a href="{{ url_for('logout') }}">Logout</a>
+      {% endif %}
+    </div>
+  </header>
+  <div class="container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
+    <div class="form-container">
+      <h2>Search for Media</h2>
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+          {{ form.query.label }}
+          <div class="input-container">
+            {{ form.query() }}
+            <i class="fa fa-filter filter-icon" onclick="toggleMediaType()"></i>
+          </div>
+          <select class="media-select" id="media-type-select">
+            <option value="images" {% if form.media_type.data == 'images' %}selected{% endif %}>Images</option>
+            <option value="audio" {% if form.media_type.data == 'audio' %}selected{% endif %}>Audio</option>
+            <option value="video" {% if form.media_type.data == 'video' %}selected{% endif %}>Video</option>
+          </select>
+        </div>
+        <div class="form-group">
+          {{ form.license_type.label }}
+          {{ form.license_type() }}
+        </div>
+        <div class="form-group">
+          {{ form.submit() }}
+        </div>
+      </form>
+    </div>
+    
+    {% if media %}
+      <div class="media-container">
+        {% for item in media %}
+          <div class="media-item">
+            {% if selected_media_type == "images" %}
+              <img src="{{ item.url }}" alt="{{ item.title }}">
+            {% elif selected_media_type == "audio" %}
+              <audio controls>
+                <source src="{{ item.url }}" type="audio/mp3">
+                Your browser does not support the audio element.
+              </audio>
+            {% elif selected_media_type == "video" %}
+              <video controls>
+                <source src="{{ item.url }}" type="video/mp4">
+                Your browser does not support the video element.
+              </video>
+            {% endif %}
+            <p>{{ item.title }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% elif searched and session.get('user_id') %}
+      <p class="no-media">No media found. Please try a different search.</p>
+    {% endif %}
+  </div>
+  <script>
+    function toggleMediaType() {
+      var selectElement = document.getElementById("media-type-select");
+      if (selectElement.style.display === "none" || selectElement.style.display === "") {
+        selectElement.style.display = "block";
+      } else {
+        selectElement.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
