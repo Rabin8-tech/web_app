@@ -53,7 +53,7 @@ python3 -m venv venv
 pip install -r requirements.txt
 Set up your MySQL database and configure the database connection:
 
-Create a database media_search and ensure your MySQL user has the correct privileges.
+Create a database mydatabase and ensure your MySQL user has the correct privileges.
 Configure your app.py or .env file to match your database credentials.
 Set up Docker (Optional):
 
